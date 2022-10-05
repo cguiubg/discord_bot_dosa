@@ -1,0 +1,3 @@
+bot-token: "YOUR_BOT_TOKEN_HERE"
+guild-id: "YOUR_GUILD_ID_HERE"
+bulletin-id: "CHANNEL_ID_TO_POST_QUESTS_HERE"
