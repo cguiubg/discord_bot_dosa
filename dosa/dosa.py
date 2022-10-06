@@ -3,7 +3,6 @@ from interactions import CommandContext
 
 import dosa.toks as toks
 
-
 class DosaClient(interactions.Client):
     def __init__(self, bot_token: str, guild_id: str, **kwargs):
         super().__init__(
@@ -16,12 +15,10 @@ class DosaClient(interactions.Client):
 class Dosa:
 
     client: DosaClient = DosaClient(
-            bot_token=toks.bot_token,
-            guild_id=toks.guild_id
-        )
-
-    def __init__(self, guild_id: str):
-        self.guild_id = guild_id
+        bot_token=toks.bot_token,
+        guild_id=toks.guild_id
+    )
+    game: DNDGame = DNDGame()
 
     @staticmethod
     @client.command(
@@ -63,33 +60,61 @@ class Dosa:
     @staticmethod
     @client.modal("post_modal")
     async def post_modal_response(ctx: CommandContext, name: str, descr: str):
-        enlist_button = interactions.Button(
-            style=interactions.ButtonStyle.DANGER,
-            label="Enlist?",
-            custom_id="bulletin_enlist_button"
-        )
         # TODO: Format quest
-        await ctx.send(f"{name}, {descr}", components=enlist_button)
-
-    @staticmethod
-    @client.component("bulletin_enlist_button")
-    async def bulletin_enlist_response(ctx: CommandContext):
-        # TODO: Manage enlisted database
-        await ctx.send("You've enlisted!")
+        await ctx.send(f"New quest, {name}, {descr}")
 
 
     @staticmethod
     @client.command(
-        name="echo",
-        description="Post a new quest to the bulletin-board",
+        name="join",
+        description="Join a posted quest.",
         options = [
             interactions.Option(
-                name="text",
-                description="Words to say",
+                name="quest_name",
+                description="The name of the quest you want to join.",
+                type=interactions.OptionType.STRING,
+                required=True,
+            ),
+            interactions.Option(
+                name="character_name",
+                description="The name of character you'd like to join quest as.",
+                type=interactions.OptionType.STRING,
+            ),
+        ],
+    )
+    async def join_command(ctx: CommandContext, quest_name: str, character_name: str):
+        await ctx.send(f"{ctx.author.name} wants to join quest: {quest_name} as {character_name}! Fill in functionality.")
+
+
+    @staticmethod
+    @client.command(
+        name="leave",
+        description="Leave a quest you've joined.",
+        options = [
+            interactions.Option(
+                name="quest_name",
+                description="The name of the quest you want to leave.",
                 type=interactions.OptionType.STRING,
                 required=True,
             ),
         ],
     )
-    async def echo_command(ctx: CommandContext, text: str):
-        await ctx.send(f"{text}")
+    async def leave_command(ctx: CommandContext, quest_name: str):
+        await ctx.send(f"{ctx.author.name} wants to leave quest: {quest_name}! Fill in functionality.")
+
+
+    @staticmethod
+    @client.command(
+        name="switch_character",
+        description="Switch your current playable character.",
+        options = [
+            interactions.Option(
+                name="character_name",
+                description="Name of character you want to play.",
+                type=interactions.OptionType.STRING,
+                required=True,
+            ),
+        ],
+    )
+    async def switch_character_command(ctx: CommandContext, character_name: str):
+        await ctx.send(f"{ctx.user.username} wants to play as {character_name}.")
