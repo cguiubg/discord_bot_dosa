@@ -2,6 +2,7 @@ import interactions
 from interactions import CommandContext
 
 import dosa.toks as toks
+import dosa.game as game
 
 class DosaClient(interactions.Client):
     def __init__(self, bot_token: str, guild_id: str, **kwargs):
@@ -18,7 +19,8 @@ class Dosa:
         bot_token=toks.bot_token,
         guild_id=toks.guild_id
     )
-    game: DNDGame = DNDGame()
+
+    dnd = game.Game()
 
     @staticmethod
     @client.command(
@@ -60,8 +62,8 @@ class Dosa:
     @staticmethod
     @client.modal("post_modal")
     async def post_modal_response(ctx: CommandContext, name: str, descr: str):
-        # TODO: Format quest
-        await ctx.send(f"New quest, {name}, {descr}")
+        result, response = Dosa.dnd.new_quest(name, descr)
+        await ctx.send(response)
 
 
     @staticmethod
@@ -70,8 +72,8 @@ class Dosa:
         description="Join a posted quest.",
         options = [
             interactions.Option(
-                name="quest_name",
-                description="The name of the quest you want to join.",
+                name="quest_id",
+                description="The id of the quest you want to join.",
                 type=interactions.OptionType.STRING,
                 required=True,
             ),
@@ -82,8 +84,9 @@ class Dosa:
             ),
         ],
     )
-    async def join_command(ctx: CommandContext, quest_name: str, character_name: str):
-        await ctx.send(f"{ctx.author.name} wants to join quest: {quest_name} as {character_name}! Fill in functionality.")
+    async def join_command(ctx: CommandContext, quest_id: str, character_name: str):
+        result, response = Dosa.dnd.join_quest(ctx.user.id if not character_name else character_name, quest_id)
+        await ctx.send(response, ephemeral=True)
 
 
     @staticmethod
@@ -92,8 +95,8 @@ class Dosa:
         description="Leave a quest you've joined.",
         options = [
             interactions.Option(
-                name="quest_name",
-                description="The name of the quest you want to leave.",
+                name="quest_id",
+                description="The id of the quest you want to leave.",
                 type=interactions.OptionType.STRING,
                 required=True,
             ),
@@ -101,7 +104,23 @@ class Dosa:
     )
     async def leave_command(ctx: CommandContext, quest_name: str):
         await ctx.send(f"{ctx.author.name} wants to leave quest: {quest_name}! Fill in functionality.")
-
+    
+    @staticmethod
+    @client.command(
+        name="new_character",
+        description="Create a new player character.",
+        options = [
+            interactions.Option(
+                name="character_name",
+                description="The name of your new character",
+                type=interactions.OptionType.STRING,
+                required=True,
+            ),
+        ],
+    )
+    async def new_character_command(ctx: CommandContext, character_name: str):
+        result, response = Dosa.dnd.new_character(character_name, ctx.user.id)
+        await ctx.send(response)
 
     @staticmethod
     @client.command(
