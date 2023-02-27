@@ -1,2 +1,2 @@
-# discord-bot-dosa
+# discord_bot_dosa
 A discord bot for our DnD campaign.

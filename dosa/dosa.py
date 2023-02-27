@@ -2,7 +2,7 @@ import interactions
 from interactions import CommandContext
 
 import dosa.toks as toks
-import dosa.game as game
+import dosa.game.game as game
 
 class DosaClient(interactions.Client):
     def __init__(self, bot_token: str, guild_id: str, **kwargs):
